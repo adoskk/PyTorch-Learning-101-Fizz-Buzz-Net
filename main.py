@@ -1,12 +1,16 @@
 import numpy as np
+import os
 import torch
 from torch.utils.tensorboard import SummaryWriter
 import time
 from utils.data_preprocessing import binary_encode, fizz_buzz_encode, fizz_buzz
-from models.models import FizzBuzzModelV3
+from utils.models import FizzBuzzModelV3
+torch.manual_seed(42)
 
-NUM_DIGITS = 10  # upper bound for the training data size
+NUM_DIGITS = 12  # upper bound for the training data size
 BATCH_SIZE = 128 # training batch size
+save_model_folder = 'models'
+epoch_num = 10000
 
 
 # Our goal is to produce fizzbuzz for the numbers 1 to 100. So it would be
@@ -22,21 +26,20 @@ valY = np.array([fizz_buzz_encode(i) for i in range(1, 101)])
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 print('Running on device: ', device)
 model = FizzBuzzModelV3(num_digits=NUM_DIGITS)
-torch.manual_seed(42)
+
 model.init_weights()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
-lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10000, gamma=0.2)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10000, gamma=0.05)
 loss_fun = torch.nn.BCEWithLogitsLoss()
 
 
-# Launch the graph in a session
 if __name__ == "__main__":
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
     writer = SummaryWriter()
     start_time = t = time.perf_counter()
-    for epoch in range(10000):
+    for epoch in range(epoch_num):
         model.train()
         # Shuffle the data before each training iteration.
         p = np.random.permutation(range(len(trX)))
@@ -80,7 +83,13 @@ if __name__ == "__main__":
     end_time = t = time.perf_counter()
     writer.close()
 
-    # output = np.vectorize(fizz_buzz)(numbers, np.argmax(val_py, axis=1)) # convert to fizz-buzz format output
-    # print(numbers, output) # uncomment if you want to visualize the actual fizz-buzz output
+    output = np.vectorize(fizz_buzz)(numbers, np.argmax(val_py, axis=1)) # convert to fizz-buzz format output
+    print('Input: ', numbers)
+    print('Ouput: ', output) # uncomment if you want to visualize the actual fizz-buzz output
 
     print('Total running time: ', end_time - start_time, ' seconds')
+    
+    if not os.path.exists(save_model_folder):
+        os.mkdir(save_model_folder)
+    print("Saving model...")
+    torch.save(model.state_dict(), os.path.join(save_model_folder, 'fizz_buzz_train' + str(epoch_num) + '.pth'))

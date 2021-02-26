@@ -1,5 +1,4 @@
 import torch
-NUM_DIGITS = 10
 
 
 class FizzBuzzModelV3(torch.nn.Module):
