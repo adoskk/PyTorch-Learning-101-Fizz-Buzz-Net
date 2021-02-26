@@ -1,4 +1,4 @@
-# -PyTorch-Learning-101-Fizz-Buzz-Net
+# PyTorch-Learning-101-Fizz-Buzz-Net
 ## A simple PyTorch project on fizz-buzz problem.
 
 This is an simple project based on [Joel Grus' blog](https://joelgrus.com/2016/05/23/fizz-buzz-in-tensorflow/).
