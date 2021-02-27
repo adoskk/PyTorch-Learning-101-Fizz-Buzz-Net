@@ -5,5 +5,6 @@ This is an simple project based on [Joel Grus' blog](https://joelgrus.com/2016/0
 
 The original Tensorflow implementation is [here](https://github.com/joelgrus/fizz-buzz-tensorflow).
 
+Run test.py to see the final result.
 
-
+![image info](output/testresult.png)
